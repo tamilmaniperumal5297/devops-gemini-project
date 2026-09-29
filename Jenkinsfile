@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_REPO = 'tamilmaniperumal5297/devops-gemini-app'
+        DOCKER_HUB_REPO = 'tamilmani5297/devops-gemini-app'
         IMAGE_TAG       = "${BUILD_NUMBER}"
         GEMINI_KEY      = credentials('gemini-api-key')
     }
