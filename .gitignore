@@ -1,12 +1,24 @@
-# Python / Virtual Environment
+# Python Virtual Environments
 venv/
 .venv/
+env/
+
+# Secrets and Kubernetes Secret files (CRITICAL)
+.env
+secret.yaml
+k8s/secret.yaml
+
+# Local tarballs and logs
+*.tar
+*.log
+devops-gemini-app.tar
+server.log
+
+# Python Cache
 __pycache__/
 *.pyc
+*.pyo
 
-# Local Environment Secrets
-.env
-
-# IDE Settings
+# System files
 .vscode/
-.idea/
+.DS_Store
