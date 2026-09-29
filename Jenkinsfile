@@ -6,7 +6,7 @@ pipeline {
         DOCKER_HUB_REPO = 'tamilmaniperumal5297/devops-gemini-app'
         IMAGE_TAG       = "${BUILD_NUMBER}"
         
-        // Fetch API Key from Jenkins Credentials Store
+        // Fetch API Key dynamically from Jenkins Credentials Store
         GEMINI_KEY      = credentials('gemini-api-key')
     }
 
@@ -21,7 +21,6 @@ pipeline {
         stage('Code Validation') {
             steps {
                 echo 'Validating Python syntax...'
-                // Using cross-platform compile check
                 sh 'python3 -m py_compile app.py test_script.py || true'
             }
         }
@@ -82,9 +81,8 @@ data:
         always {
             script {
                 echo 'Cleaning up temporary workspace secrets...'
-                def secretFile = new File("${WORKSPACE}/k8s/secret.yaml")
-                if (secretFile.exists()) {
-                    secretFile.delete()
+                if (fileExists('k8s/secret.yaml')) {
+                    sh 'rm -f k8s/secret.yaml'
                     echo 'k8s/secret.yaml safely removed.'
                 }
             }
