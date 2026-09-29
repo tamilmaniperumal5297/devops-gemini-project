@@ -46,18 +46,18 @@ pipeline {
         stage('Generate Dynamic K8s Secret') {
             steps {
                 echo 'Injecting credentials into runtime Kubernetes secret...'
-                script {
-                    def encodedKey = GEMINI_KEY.bytes.encodeBase64().toString()
-                    writeFile file: 'k8s/secret.yaml', text: """
+                sh '''
+                    ENCODED_KEY=$(echo -n "$GEMINI_KEY" | base64 | tr -d '\\n')
+                    cat <<EOF > k8s/secret.yaml
 apiVersion: v1
 kind: Secret
 metadata:
   name: gemini-secret
 type: Opaque
 data:
-  GEMINI_API_KEY: ${encodedKey}
-"""
-                }
+  GEMINI_API_KEY: ${ENCODED_KEY}
+EOF
+                '''
             }
         }
 
