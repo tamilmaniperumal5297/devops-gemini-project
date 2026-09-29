@@ -2,15 +2,18 @@ pipeline {
     agent any
 
     environment {
+        // Docker Hub repository definition
         DOCKER_HUB_REPO = 'tamilmaniperumal5297/devops-gemini-app'
         IMAGE_TAG       = "${BUILD_NUMBER}"
+        
+        // Fetch API Key from Jenkins Credentials Store
         GEMINI_KEY      = credentials('gemini-api-key')
     }
 
     stages {
         stage('Checkout Source Code') {
             steps {
-                echo 'Checking out code from GitHub...'
+                echo 'Checking out source code from GitHub...'
                 checkout scm
             }
         }
@@ -18,6 +21,7 @@ pipeline {
         stage('Code Validation') {
             steps {
                 echo 'Validating Python syntax...'
+                // Using cross-platform compile check
                 sh 'python3 -m py_compile app.py test_script.py || true'
             }
         }
@@ -76,16 +80,20 @@ data:
 
     post {
         always {
-            node {
-                echo 'Cleaning up sensitive build artifacts...'
-                sh 'rm -f k8s/secret.yaml || true'
+            script {
+                echo 'Cleaning up temporary workspace secrets...'
+                def secretFile = new File("${WORKSPACE}/k8s/secret.yaml")
+                if (secretFile.exists()) {
+                    secretFile.delete()
+                    echo 'k8s/secret.yaml safely removed.'
+                }
             }
         }
         success {
-            echo 'Pipeline completed successfully!'
+            echo 'Pipeline executed successfully! Application deployed to Kubernetes.'
         }
         failure {
-            echo 'Pipeline failed. Check stage logs above.'
+            echo 'Pipeline execution failed. Inspect stage logs for details.'
         }
     }
 }
