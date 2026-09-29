@@ -47,10 +47,13 @@ pipeline {
             steps {
                 echo 'Injecting credentials into runtime Kubernetes secret...'
                 sh '''
+                    # Ensure the k8s directory exists before creating secret.yaml
+                    mkdir -p k8s
+
                     # Convert GEMINI_KEY string to Base64 without newline line breaks
                     ENCODED_KEY=$(echo -n "$GEMINI_KEY" | base64 | tr -d '\r\n')
 
-cat <<EOF > k8s/secret.yaml
+                    cat <<EOF > k8s/secret.yaml
 apiVersion: v1
 kind: Secret
 metadata:
