@@ -2,18 +2,15 @@ pipeline {
     agent any
 
     environment {
-        // Replace 'your-dockerhub-username' with your actual Docker Hub username
-        DOCKER_HUB_REPO = 'tamilmani5297/devops-gemini-app'
+        DOCKER_HUB_REPO = 'tamilmaniperumal5297/devops-gemini-app'
         IMAGE_TAG       = "${BUILD_NUMBER}"
-        
-        // Fetch API Key dynamically from Jenkins Credentials Store
         GEMINI_KEY      = credentials('gemini-api-key')
     }
 
     stages {
-        stage('Checkout Code') {
+        stage('Checkout Source Code') {
             steps {
-                echo 'Pulling application source code from GitHub...'
+                echo 'Checking out code from GitHub...'
                 checkout scm
             }
         }
@@ -21,7 +18,7 @@ pipeline {
         stage('Code Validation') {
             steps {
                 echo 'Validating Python syntax...'
-                sh 'python3 -m py_compile app.py || true'
+                sh 'python3 -m py_compile app.py test_script.py || true'
             }
         }
 
@@ -32,9 +29,9 @@ pipeline {
             }
         }
 
-        stage('Push to Docker Hub') {
+        stage('Push Image to Docker Hub') {
             steps {
-                echo 'Authenticating and pushing image to registry...'
+                echo 'Authenticating and pushing image to Docker Hub...'
                 withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     sh '''
                         echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
@@ -79,14 +76,16 @@ data:
 
     post {
         always {
-            echo 'Cleaning up sensitive build artifacts...'
-            sh 'rm -f k8s/secret.yaml'
+            node {
+                echo 'Cleaning up sensitive build artifacts...'
+                sh 'rm -f k8s/secret.yaml || true'
+            }
         }
         success {
             echo 'Pipeline completed successfully!'
         }
         failure {
-            echo 'Pipeline failed. Inspect stage logs above.'
+            echo 'Pipeline failed. Check stage logs above.'
         }
     }
 }
