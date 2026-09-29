@@ -2,11 +2,8 @@ pipeline {
     agent any
 
     environment {
-        // Docker Hub repository definition
         DOCKER_HUB_REPO = 'tamilmaniperumal5297/devops-gemini-app'
         IMAGE_TAG       = "${BUILD_NUMBER}"
-        
-        // Fetch API Key dynamically from Jenkins Credentials Store
         GEMINI_KEY      = credentials('gemini-api-key')
     }
 
@@ -91,7 +88,7 @@ data:
             echo 'Pipeline executed successfully! Application deployed to Kubernetes.'
         }
         failure {
-            echo 'Pipeline execution failed. Inspect stage logs for details.'
+            echo 'Pipeline execution failed. Inspect stage logs above.'
         }
     }
 }
